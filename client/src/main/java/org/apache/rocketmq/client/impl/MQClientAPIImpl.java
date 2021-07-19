@@ -431,6 +431,25 @@ public class MQClientAPIImpl {
         return sendMessage(addr, brokerName, msg, requestHeader, timeoutMillis, communicationMode, null, null, null, 0, context, producer);
     }
 
+    /**
+     * 发送消息
+     * @param addr 地址
+     * @param brokerName broker名
+     * @param msg 消息体
+     * @param requestHeader 请求头
+     * @param timeoutMillis 超时时长
+     * @param communicationMode 通信方式
+     * @param sendCallback 发送后回调
+     * @param topicPublishInfo 主题信息
+     * @param instance MQ实例
+     * @param retryTimesWhenSendFailed 重试次数
+     * @param context
+     * @param producer 生产者
+     * @return
+     * @throws RemotingException
+     * @throws MQBrokerException
+     * @throws InterruptedException
+     */
     public SendResult sendMessage(
         final String addr,
         final String brokerName,

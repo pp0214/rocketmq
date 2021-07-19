@@ -16,9 +16,24 @@
  */
 package org.apache.rocketmq.client.producer;
 
+/**
+ * 消息发送结果
+ */
 public enum SendStatus {
+    /**
+     * 发送成功
+     */
     SEND_OK,
+    /**
+     * 消息发送成功但是服务器刷盘超时，broker设置为同步刷盘且超时会出现
+     */
     FLUSH_DISK_TIMEOUT,
+    /**
+     * 消息发送成功但是服务器同步到Slave时超时。此时消息已经进入服务器队列，只有服务器宕机，消息才会丢失
+     */
     FLUSH_SLAVE_TIMEOUT,
+    /**
+     * 消息发送成功，但此时Slave不可用
+     */
     SLAVE_NOT_AVAILABLE,
 }

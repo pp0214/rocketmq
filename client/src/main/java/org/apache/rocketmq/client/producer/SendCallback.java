@@ -16,8 +16,20 @@
  */
 package org.apache.rocketmq.client.producer;
 
+/**
+ * 消息异步发送时的回调
+ * @author yangtianyu
+ */
 public interface SendCallback {
+    /**
+     * 发送成功是的回调
+     * @param sendResult 发送结果
+     */
     void onSuccess(final SendResult sendResult);
 
+    /**
+     * 发送时产生异常的回调
+     * @param e
+     */
     void onException(final Throwable e);
 }

@@ -100,7 +100,14 @@ public class MQClientInstance {
     private final ConcurrentMap<String/* Topic */, TopicRouteData> topicRouteTable = new ConcurrentHashMap<String, TopicRouteData>();
     private final Lock lockNamesrv = new ReentrantLock();
     private final Lock lockHeartbeat = new ReentrantLock();
-    private final ConcurrentMap<String/* Broker Name */, HashMap<Long/* brokerId */, String/* address */>> brokerAddrTable =
+    /**
+     * 存储每一个broker所属集群的网络地址
+     * key: brokerName
+     * value: address map
+     *      key: brokerId
+     *      value: address
+     */
+    private final ConcurrentMap<String, HashMap<Long, String>> brokerAddrTable =
         new ConcurrentHashMap<String, HashMap<Long, String>>();
     private final ConcurrentMap<String/* Broker Name */, HashMap<String/* address */, Integer>> brokerVersionTable =
         new ConcurrentHashMap<String, HashMap<String, Integer>>();
@@ -602,6 +609,13 @@ public class MQClientInstance {
         }
     }
 
+    /**
+     * 从NameServer获取指定topic相关信息
+     * @param topic topicName
+     * @param isDefault 是否用默认主题去查询
+     * @param defaultMQProducer 生产者实例
+     * @return
+     */
     public boolean updateTopicRouteInfoFromNameServer(final String topic, boolean isDefault,
         DefaultMQProducer defaultMQProducer) {
         try {
