@@ -19,9 +19,18 @@ package org.apache.rocketmq.store;
 import java.util.concurrent.atomic.AtomicLong;
 
 public abstract class ReferenceResource {
+    /**
+     * 当前资源的引用数
+     */
     protected final AtomicLong refCount = new AtomicLong(1);
     protected volatile boolean available = true;
+    /**
+     * 是否将MappedByteBuffer资源释放
+     */
     protected volatile boolean cleanupOver = false;
+    /**
+     * 初次执行shutdown命令的时间
+     */
     private volatile long firstShutdownTimestamp = 0;
 
     public synchronized boolean hold() {
@@ -40,12 +49,18 @@ public abstract class ReferenceResource {
         return this.available;
     }
 
+    /**
+     * MappedFile销毁
+     * @param intervalForcibly 拒绝被销毁的最大存活时间
+     */
     public void shutdown(final long intervalForcibly) {
+        // 关闭MappedFile，尝试释放资源
         if (this.available) {
             this.available = false;
             this.firstShutdownTimestamp = System.currentTimeMillis();
             this.release();
         } else if (this.getRefCount() > 0) {
+            // 如果超过了最大拒绝存活区，每执行一次，引用数减少1000
             if ((System.currentTimeMillis() - this.firstShutdownTimestamp) >= intervalForcibly) {
                 this.refCount.set(-1000 - this.getRefCount());
                 this.release();
@@ -54,9 +69,11 @@ public abstract class ReferenceResource {
     }
 
     public void release() {
+        // 引用次数-1
         long value = this.refCount.decrementAndGet();
-        if (value > 0)
+        if (value > 0) {
             return;
+        }
 
         synchronized (this) {
 
@@ -70,6 +87,11 @@ public abstract class ReferenceResource {
 
     public abstract boolean cleanup(final long currentRef);
 
+    /**
+     * 判断是否清理完成 引用次数小于等于 0 并且 cleanupOver 为 true,
+     * cleanupOver 为 true 的触发条件是 release 成功将 MappedByteBuff，巳r 资源释放
+     * @return
+     */
     public boolean isCleanupOver() {
         return this.refCount.get() <= 0 && this.cleanupOver;
     }

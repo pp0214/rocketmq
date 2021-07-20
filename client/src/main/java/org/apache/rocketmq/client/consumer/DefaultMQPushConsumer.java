@@ -119,7 +119,8 @@ public class DefaultMQPushConsumer extends ClientConfig implements MQPushConsume
      * </li>
      * <li>
      * <code>CONSUME_FROM_TIMESTAMP</code>: Consumer client will start from specified timestamp, which means
-     * messages born prior to {@link #consumeTimestamp} will be ignored
+     * messages born prior to {@link #consumeTimestamp} will be ignored、
+     * 根据消息进度从消息服务器拉取不到消 息时重新计算消费策略
      * </li>
      * </ul>
      */
@@ -134,7 +135,7 @@ public class DefaultMQPushConsumer extends ClientConfig implements MQPushConsume
     private String consumeTimestamp = UtilAll.timeMillisToHumanString3(System.currentTimeMillis() - (1000 * 60 * 30));
 
     /**
-     * Queue allocation algorithm specifying how message queues are allocated to each consumer clients.
+     * 集群模式下消息队列负载策略
      */
     private AllocateMessageQueueStrategy allocateMessageQueueStrategy;
 
@@ -170,6 +171,7 @@ public class DefaultMQPushConsumer extends ClientConfig implements MQPushConsume
 
     /**
      * Concurrently max span offset.it has no effect on sequential consumption
+     * 并发消息消费时处理队列最大跨度，
      */
     private int consumeConcurrentlyMaxSpan = 2000;
 
